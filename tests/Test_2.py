@@ -16,13 +16,37 @@ def translate_it(text, to_lang):
     }
 
     response = requests.get (URL, params = params)
-    return response
+    json_ = response.json ()
+    return ''.join (json_[ 'text' ])
+
+def get_request(text, to_lang):
+    params = {
+        'key': API_KEY,
+        'text': text,
+        'lang': to_lang,
+
+    }
+
+    response = requests.get (URL, params = params)
+    return response.status_code
 
 class TestGetRequest(unittest.TestCase):
 
-    def right_translate(self):
+    def test_right_translate(self):
         result = translate_it('Hello', 'ru')
-        self.assertEqual('привет', result)
+        self.assertEqual('Привет', result)
+
+    def test_good_request(self):
+        result = get_request('Hello', 'ru')
+        self.assertEqual(200, result)
+
+    def test_wrong_translate(self):
+        result = translate_it('Hello', 'ru')
+        self.assertNotEqual('пока', result)
+
+    def test_bad_request(self):
+        result = get_request('', 'ru')
+        self.assertEqual(400, result)
 
 if __name__ == '__main__':
     unittest.main()
